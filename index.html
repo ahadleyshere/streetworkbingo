@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Streetwork Bingo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{--bg:#E8EDF3;--surface:#fff;--ink:#1D2733;--muted:#5C6B7A;--line:#CAD3DD;--pri:#5B3FD9;--pri-ink:#fff;--sun:#FFC93C;--ok:#1E8E5A;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141A24;--surface:#1F2836;--ink:#EAF0F7;--muted:#9AA9BA;--line:#33415A;--pri:#9B86FF;--pri-ink:#12102A;--ok:#4CC38A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141A24;--surface:#1F2836;--ink:#EAF0F7;--muted:#9AA9BA;--line:#33415A;--pri:#9B86FF;--pri-ink:#12102A;--ok:#4CC38A;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px 16px 48px}
+h1,h2,.pts,.big{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif}
+h1{font-size:2.3rem;line-height:1;margin:6px 0 4px;font-weight:800;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:0 0 16px}
+h2{font-size:1.2rem;margin:26px 0 10px}
+button,input{font:inherit;color:inherit}
+button{min-height:46px;border-radius:10px;border:2px solid var(--pri);background:transparent;color:var(--pri);font-weight:700;padding:8px 14px;cursor:pointer}
+button.primary{background:var(--pri);color:var(--pri-ink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+input{width:100%;min-height:46px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.me{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--pri);color:var(--pri-ink);border-radius:14px;padding:12px 16px}
+.me .big{font-size:2rem;font-weight:800;line-height:1}
+.me small{display:block;opacity:.85}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;display:grid;gap:10px}
+.card.pop{animation:pop .35s}
+@keyframes pop{from{transform:scale(.97);background:var(--sun)}to{transform:none}}
+.top{display:flex;gap:12px;align-items:flex-start}
+.pts{flex:none;min-width:52px;text-align:center;background:var(--sun);color:#1D2733;border-radius:10px;padding:6px 8px;font-weight:800;font-size:1.3rem;line-height:1.1}
+.pts small{display:block;font-size:.7rem;font-weight:500}
+.task{font-size:1.1rem;margin:0}
+.btns{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+.rank{list-style:none;margin:0;padding:0}
+.rank li{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.rank li.you{border:2px solid var(--pri)}
+.rank .n{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:1.3rem;text-align:center}
+.rank .s{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:1.3rem}
+.rank .last{display:block;color:var(--muted);font-size:.85rem}
+.team{display:flex;justify-content:space-between;color:var(--muted);margin:4px 2px 10px}
+.note{color:var(--muted);font-size:.9rem;margin-top:14px}
+.empty{text-align:center;color:var(--muted);padding:18px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){.card.pop{animation:none}.toast{transition:none}}
+.winner{margin-top:22px;background:var(--sun);color:#1D2733;border-radius:14px;padding:12px 16px}
+.winner strong{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.15rem}
+.winner small{display:block;margin-top:2px}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cell{min-height:118px;padding:8px;text-align:left;font-size:.88rem;line-height:1.25;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;font-weight:400;display:flex;flex-direction:column;justify-content:space-between;gap:6px}
+.cell[aria-pressed="true"]{background:var(--pri);color:var(--pri-ink);border-color:var(--pri)}
+.cell.sel{outline:3px solid var(--sun);outline-offset:2px}
+.cell .pp{align-self:flex-end;background:var(--sun);color:#1D2733;border-radius:8px;padding:0 8px;font-weight:800;font-size:.85rem}
+.act{margin-top:12px}
+.act .card{margin:0}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.tabs button[aria-pressed="true"]{background:var(--pri);color:var(--pri-ink)}
+details.add{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:22px}
+details.add summary{font-weight:700;cursor:pointer;min-height:32px}
+details.add summary:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.addrow{display:grid;grid-template-columns:1fr 92px;gap:10px;margin:10px 0}
+select{width:100%;min-height:46px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit}
+.mine{list-style:none;margin:10px 0 0;padding:0}
+.mine li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.mine button{min-height:36px;padding:2px 10px;font-size:.9rem}
+[hidden]{display:none!important}
+</style>
+<style>
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.6rem;line-height:1.1}
+.stat span{color:var(--muted);font-size:.85rem}
+textarea{width:100%;min-height:90px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit}
+</style>
+</head>
+<body>
+<main>
+<h1>Streetwork Bingo</h1>
+<p class="sub">Neun Dinge in der Stadt. Hake sie ab, sammle Reihen. Pro Tag darfst du dreimal Felder tauschen.</p>
+
+<section id="join" hidden>
+<label for="nick"><strong>Wie sollen dich die anderen nennen?</strong></label>
+<div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:8px">
+<input id="nick" maxlength="20" autocomplete="off" placeholder="Spitzname">
+<button class="primary" id="go">Los geht’s</button>
+</div>
+</section>
+
+<section id="game" hidden>
+<div class="me"><div><strong id="meName"></strong><small id="meInfo"></small></div><div class="big" id="meScore">0</div></div>
+<h2>Deine Bingo-Karte</h2>
+<div class="board" id="board"></div>
+<div class="act" id="act"></div>
+<p class="note">Reihe, Spalte oder Diagonale voll: +5 Bonus. Ganze Karte voll: +15 Bonus und eine neue Karte.</p>
+
+<h2>Dein Stand</h2>
+<div class="stats">
+<div class="stat"><b id="sDay">0</b><span>Heute</span></div>
+<div class="stat"><b id="sWeek">0</b><span>Diese Woche</span></div>
+<div class="stat"><b id="sLast">0</b><span>Letzte Woche</span></div>
+</div>
+<p class="note">Zum Vergleichen im Team: Stand als Text kopieren und in euren Gruppenchat schicken. Deinen Namen schreibst du im Chat selbst dazu.</p>
+<div class="btns" style="grid-template-columns:1fr 1fr"><button class="primary" id="share">Stand kopieren</button><button id="toggleTxt">Text anzeigen</button></div>
+<textarea id="txt" readonly hidden aria-label="Stand als Text"></textarea>
+
+<details class="add"><summary>Eigene Aufgabe hinzufügen</summary>
+<div class="addrow"><input id="newT" maxlength="80" placeholder="Was kann man in der Stadt sehen?" aria-label="Neue Aufgabe"><select id="newP" aria-label="Punkte"><option value="1">1 Pkt</option><option value="2" selected>2 Pkt</option><option value="3">3 Pkt</option></select></div>
+<button class="primary" id="addT">Aufgabe hinzufügen</button>
+<p class="note">Eigene Aufgaben gelten nur auf diesem Gerät.</p>
+<ul class="mine" id="mine"></ul></details>
+
+<p class="note">Es geht nur ums Sehen. Bitte nichts fotografieren und niemanden ansprechen oder bloßstellen. Alle Aufgaben zählen auf Ehrenwort.</p>
+<p class="note"><button id="again">Neue Runde starten</button> Setzt die Runden-Punkte zurück, Tages- und Wochenstand und die heutigen Tausche bleiben.</p>
+<p class="note">Dein Spielstand liegt nur in diesem Browser auf diesem Gerät. Wenn du den Browserverlauf löschst, ist er weg.</p>
+</section>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+var TASKS=[
+["Eine Person sammelt Pfandflaschen",3],["Jemand hört Musik laut über Handylautsprecher",2],["Ein Hund trägt Mantel oder Pullover",2],
+["Eine Person fährt Tandem oder Lastenrad",3],["Jemand telefoniert und läuft dabei im Kreis",1],["Eine Taube sitzt auf einem Fahrrad oder Müllkübel",2],
+["Jemand trägt etwas Sperriges allein durch die Stadt",2],["Eine Person liest ein gedrucktes Buch im Stehen",3],["Zwei Menschen mit dem gleichen Outfit",3],
+["Jemand isst Eis, obwohl es kalt ist",2],["Straßenmusik, egal welches Instrument",1],["Eine Person mit Regenschirm bei Sonne",2],
+["Jemand schläft auf einer Bank",2],["Eine Person lacht laut allein",2],["Ein Fahrrad mit ungewöhnlicher Ladung",2],
+["Jemand trägt Hut und Krawatte",2],["Ein Tisch oder Sofa steht am Gehsteig zum Mitnehmen",3],["Jemand spielt Schach oder Karten draußen",3],
+["Ein E-Scooter liegt an einem unmöglichen Ort",2],["Ein Mensch tanzt mitten auf dem Gehsteig",3],["Eine Person trägt Sonnenbrille bei Regen",2],
+["Eine Gruppe macht ein Selfie",1],["Ein Kind auf dem Roller, dahinter die Eltern auf Rädern",2],["Jemand trägt zwei verschiedene Schuhe",3],
+["Ein riesiger Hund mit winzigem Besitzer",3],["Eine Person mit Blumenstrauß",1],["Eine Person schiebt ein Fahrrad mit plattem Reifen",2],
+["Jemand zählt Münzen im Stehen",3],["Ein Regenbogen oder ein Doppelregenbogen",3],["Jemand telefoniert mit Kopfhörern und gestikuliert wild",1],
+["Jemand verkauft oder liest eine Straßenzeitung",2],["Eine Person hilft einer anderen mit der Tasche oder der Tür",1],
+["Jemand teilt Essen oder Getränke mit einer anderen Person",2],["Ein Mensch mit Schlafsack oder Decke auf einer Bank",2],
+["Eine Person mit vollbepacktem Einkaufswagen",2],["Ein Hund liegt entspannt auf einer Decke vor einem Geschäft",2],
+["Jemand füllt eine Flasche an einem Trinkbrunnen",2],["Eine Person durchsucht einen Mülleimer nach Pfand",3],
+["Zwei Menschen unterhalten sich lange und herzlich auf der Straße",1],["Jemand wartet vor einem Geschäft, das noch geschlossen ist",1],
+["Ein Mensch trägt im Sommer Winterjacke",2],["Jemand füttert Tauben, obwohl es verboten ist",2],["Eine Person fährt mit dem Rad ohne Licht in der Dämmerung",1],
+["Ein Auto mit Kennzeichen aus einem anderen Bundesland",1],["Jemand sitzt auf dem Boden und liest oder schreibt",2],["Eine Person macht Yoga oder Dehnübungen im Park",3],
+["Jemand fährt einen Rollstuhl mit Musik oder Wimpel",3],["Ein Mensch jongliert oder macht Straßenzauber",3]
+];
+
+var KEY="streetwork-bingo-solo-v1",MAXSKIP=3;
+var LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+var me=null,sel=-1;
+var $=function(id){return document.getElementById(id)};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show")},2200)}
+function load(){try{var r=localStorage.getItem(KEY);return r?JSON.parse(r):null}catch(e){return null}}
+var warned=false;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(me))}catch(e){if(!warned){warned=true;toast("Speichern im Browser nicht möglich")}}}
+function rnd(n){return Math.floor(Math.random()*n)}
+function T(k){
+if(k.charAt(0)==="b"){var t=TASKS[+k.slice(1)];return t?{t:t[0],p:t[1]}:null}
+var c=me.custom[k];return c?{t:c.t,p:c.p}:null}
+function allKeys(){var r=[];for(var i=0;i<TASKS.length;i++)r.push("b"+i);for(var k in me.custom)r.push(k);return r}
+function newBoard(){
+var avail=allKeys().filter(function(k){return me.found.indexOf(k)<0});
+if(avail.length<9){me.found=[];avail=allKeys()}
+var b=[];while(b.length<9&&avail.length)b.push({k:avail.splice(rnd(avail.length),1)[0],s:0});
+me.board=b}
+function swapKey(){
+var on=me.board.map(function(c){return c.k});
+var a=allKeys().filter(function(k){return on.indexOf(k)<0&&me.found.indexOf(k)<0});
+if(!a.length)a=allKeys().filter(function(k){return on.indexOf(k)<0});
+return a.length?a[rnd(a.length)]:null}
+function nLines(){return LINES.filter(function(l){return l.every(function(i){return me.board[i].s})}).length}
+function boardPts(){var s=0;me.board.forEach(function(c){if(c.s)s+=c.p||0});s+=nLines()*5;if(me.board.every(function(c){return c.s}))s+=15;return s}
+function total(){return me.banked+boardPts()}
+function dayKey(){return new Date().toDateString()}
+function refreshSkips(){var d=dayKey();if(me.skipDay!==d){me.skipDay=d;me.skips=MAXSKIP;return true}return false}
+function fresh(name){me={name:name,score:0,banked:0,found:[],skipDay:dayKey(),skips:MAXSKIP,recent:[],round:1,log:[],board:[],custom:{}};newBoard()}
+function dayStart(){var d=new Date();d.setHours(0,0,0,0);return d.getTime()}
+function weekStart(){var d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getTime()}
+function sum(a,b){var s=0;me.log.forEach(function(e){if(e[0]>=a&&e[0]<b)s+=e[1]});return s}
+function stats(){
+var ws=weekStart(),d=new Date(ws);d.setDate(d.getDate()-7);
+return{day:sum(dayStart(),Infinity),week:sum(ws,Infinity),last:sum(d.getTime(),ws)}}
+function logDelta(d){if(!d)return;var now=Date.now(),cut=now-21*864e5;me.log=me.log.filter(function(e){return e[0]>=cut});me.log.push([now,d])}
+
+function render(){
+$("board").innerHTML=me.board.map(function(c,i){
+var t=c.s?{t:c.t,p:c.p}:T(c.k);if(!t)return"";
+return '<button class="cell'+(i===sel?' sel':'')+'" data-i="'+i+'" aria-pressed="'+(c.s?'true':'false')+'"><span>'+(c.s?'✓ ':'')+esc(t.t)+'</span><span class="pp">'+t.p+'</span></button>';
+}).join("");
+var c=me.board[sel],h="";
+if(c){
+if(c.s)h='<div class="card"><p class="task">'+esc(c.t)+'</p><div class="btns"><button data-a="undo">Zurücknehmen</button><button data-a="close">Schließen</button></div></div>';
+else{var t=T(c.k);h='<div class="card"><p class="task">'+esc(t?t.t:"")+'</p><div class="btns"><button class="primary" data-a="seen">Gesehen</button><button data-a="swap"'+(me.skips<1?' disabled':'')+'>Tauschen ('+me.skips+')</button></div><button data-a="close">Schließen</button></div>'}
+}
+$("act").innerHTML=h;
+$("meName").textContent="Runde "+me.round;
+$("meScore").textContent=me.score;
+$("meInfo").textContent=me.board.filter(function(x){return x.s}).length+"/9 auf der Karte · "+nLines()+" Reihen · "+me.skips+" Tausche heute übrig";
+var st=stats();$("sDay").textContent=st.day;$("sWeek").textContent=st.week;$("sLast").textContent=st.last;
+$("txt").value="Streetwork Bingo\nHeute: "+st.day+" Punkte\nDiese Woche: "+st.week+" Punkte\nLetzte Woche: "+st.last+" Punkte";
+var mine=Object.keys(me.custom);
+$("mine").innerHTML=mine.map(function(k){return '<li><span>'+esc(me.custom[k].t)+' ('+me.custom[k].p+')</span><button data-del="'+esc(k)+'">Löschen</button></li>'}).join("");
+}
+
+function mark(i){
+var c=me.board[i],t=T(c.k);if(c.s||!t)return;
+var before=total();
+c.s=1;c.t=t.t;c.p=t.p;me.found.push(c.k);me.recent.unshift(t.t);me.recent=me.recent.slice(0,3);
+var after=total(),d=after-before;logDelta(d);
+if(me.board.every(function(x){return x.s})){me.banked=after;newBoard();sel=-1;toast("Karte voll! +"+d+" Punkte, neue Karte")}
+else toast("+"+d+(d>t.p?" Punkte (Bonus!)":" Punkte"));
+me.score=total();render();save()}
+function unmark(i){
+var c=me.board[i];if(!c.s)return;
+var before=total();
+c.s=0;me.found=me.found.filter(function(k){return k!==c.k});
+var j=me.recent.indexOf(c.t);if(j>=0)me.recent.splice(j,1);
+var d=total()-before;logDelta(d);me.score=total();render();save();toast(d+" Punkte")}
+function swap(i){
+refreshSkips();var c=me.board[i];if(c.s||me.skips<1)return;
+var nk=swapKey();if(!nk){toast("Keine weitere Aufgabe verfügbar");return}
+c.k=nk;me.skips--;sel=-1;render();save()}
+
+$("board").addEventListener("click",function(e){
+var b=e.target.closest("[data-i]");if(!b)return;
+if(refreshSkips())save();
+var i=+b.getAttribute("data-i");sel=(sel===i)?-1:i;render()});
+$("act").addEventListener("click",function(e){
+var a=e.target.getAttribute("data-a");if(!a||sel<0)return;
+if(a==="seen")mark(sel);else if(a==="undo")unmark(sel);else if(a==="swap")swap(sel);else{sel=-1;render()}});
+$("again").onclick=function(){
+if(!confirm("Neue Runde starten? Runden-Punkte werden zurückgesetzt, die heutigen Tausche bleiben."))return;
+me.round++;me.score=0;me.banked=0;me.found=[];me.recent=[];sel=-1;newBoard();render();save();toast("Runde "+me.round+" läuft")};
+$("addT").onclick=function(){
+var t=$("newT").value.trim();if(t.length<5){toast("Bitte kurz beschreiben, was man sieht");return}
+me.custom["c_"+Date.now().toString(36)+rnd(999)]={t:t,p:+$("newP").value};
+$("newT").value="";render();save();toast("Aufgabe hinzugefügt")};
+$("mine").addEventListener("click",function(e){
+var k=e.target.getAttribute("data-del");if(!k)return;
+delete me.custom[k];
+me.board.forEach(function(c){if(!c.s&&c.k===k){var nk=swapKey();if(nk)c.k=nk}});
+render();save()});
+$("toggleTxt").onclick=function(){var t=$("txt");t.hidden=!t.hidden;this.textContent=t.hidden?"Text anzeigen":"Text verbergen"};
+$("share").onclick=function(){
+var t=$("txt"),text=t.value;
+function fallback(){var was=t.hidden;t.hidden=false;t.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}if(was&&ok)t.hidden=true;toast(ok?"Stand kopiert":"Text markiert, bitte manuell kopieren")}
+if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){toast("Stand kopiert")},fallback)}else fallback()};
+$("go").onclick=function(){
+var n=$("nick").value.trim();if(!n){toast("Bitte einen Spitznamen eingeben");return}
+fresh(n);start();save()};
+$("nick").addEventListener("keydown",function(e){if(e.key==="Enter")$("go").click()});
+function start(){$("join").hidden=true;$("game").hidden=false;render()}
+
+me=load();
+if(me&&Array.isArray(me.board)&&me.board.length===9){
+me.custom=me.custom||{};me.log=me.log||[];me.found=me.found||[];me.recent=me.recent||[];
+refreshSkips();me.board.forEach(function(c){if(!c.s&&!T(c.k)){var nk=swapKey();if(nk)c.k=nk}});
+me.score=total();start();save()}
+else{fresh("");start();save()}
+})();
+</script>
+</body>
+</html>
