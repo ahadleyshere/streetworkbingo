@@ -3,8 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5B3FD9">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bingo">
 <title>Streetwork Bingo</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
 <style>
 :root{--bg:#E8EDF3;--surface:#fff;--ink:#1D2733;--muted:#5C6B7A;--line:#CAD3DD;--pri:#5B3FD9;--pri-ink:#fff;--sun:#FFC93C;--ok:#1E8E5A;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -46,7 +52,11 @@ input{width:100%;min-height:46px;padding:8px 12px;border:1px solid var(--line);b
 .empty{text-align:center;color:var(--muted);padding:18px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%}
 .toast.show{opacity:1}
-@media (prefers-reduced-motion:reduce){.card.pop{animation:none}.toast{transition:none}}
+.bingo{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.9);background:var(--sun);color:#1D2733;border-radius:18px;padding:18px 30px;text-align:center;opacity:0;pointer-events:none;z-index:5;transition:opacity .2s,transform .2s;box-shadow:0 8px 30px rgba(0,0,0,.25);max-width:90%}
+.bingo.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.bingo span{display:block;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:2.2rem;line-height:1.1}
+.bingo small{display:block;font-size:1rem;margin-top:4px}
+@media (prefers-reduced-motion:reduce){.card.pop{animation:none}.toast{transition:none}.bingo{transition:none}}
 .winner{margin-top:22px;background:var(--sun);color:#1D2733;border-radius:14px;padding:12px 16px}
 .winner strong{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.15rem}
 .winner small{display:block;margin-top:2px}
@@ -73,6 +83,8 @@ select{width:100%;min-height:46px;padding:8px;border:1px solid var(--line);borde
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
 .stat b{display:block;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.6rem;line-height:1.1}
+.top{list-style:none;margin:0;padding:0}
+.top li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
 .stat span{color:var(--muted);font-size:.85rem}
 textarea{width:100%;min-height:90px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit}
 </style>
@@ -103,6 +115,13 @@ textarea{width:100%;min-height:90px;padding:10px;border:1px solid var(--line);bo
 <div class="stat"><b id="sWeek">0</b><span>Diese Woche</span></div>
 <div class="stat"><b id="sLast">0</b><span>Letzte Woche</span></div>
 </div>
+<div class="stats" style="margin-top:8px">
+<div class="stat"><b id="sStreak">0</b><span>Tage in Folge</span></div>
+<div class="stat"><b id="sBest">0</b><span>Beste Serie</span></div>
+<div class="stat"><b id="sTotal">0</b><span>Insgesamt gesehen</span></div>
+</div>
+<p class="note" style="margin-bottom:0"><strong>Am häufigsten gesehen</strong></p>
+<ul class="top" id="top"></ul>
 <p class="note">Zum Vergleichen im Team: Stand als Text kopieren und in euren Gruppenchat schicken. Deinen Namen schreibst du im Chat selbst dazu.</p>
 <div class="btns" style="grid-template-columns:1fr 1fr"><button class="primary" id="share">Stand kopieren</button><button id="toggleTxt">Text anzeigen</button></div>
 <textarea id="txt" readonly hidden aria-label="Stand als Text"></textarea>
@@ -119,6 +138,7 @@ textarea{width:100%;min-height:90px;padding:10px;border:1px solid var(--line);bo
 </section>
 </main>
 <div class="toast" id="toast" role="status"></div>
+<div class="bingo" id="bingo" role="status" aria-live="polite"></div>
 
 <script>
 (function(){
@@ -144,14 +164,32 @@ null,["Jemand füttert Tauben, obwohl es verboten ist",2],["Eine Person fährt m
 ["Person mit einer kurzen karierten Hose",2],["Person mit Fahrradhelm ohne Fahrrad",2],["Tinder-Date",3],["Ratten",3],
 ["Menschen, die mit Katzen spazieren gehen",3],["Person mit Kleidung, die nicht wetteradäquat ist",1],["Person, die Zigarettenstummel sammelt und raucht",3],
 null,["Personen, die mehr als 3 Vogelfedern mitführen",3],["Personen, die ohne Auto übersiedeln",3],
-["Person, die mit mehr als 5 Sackerln unterwegs ist",2],["Person, die komplett in einer Farbe gekleidet ist (außer Schwarz)",2],["Person, die uns in einer anderen Sprache anspricht",2]
+["Person, die mit mehr als 5 Sackerln unterwegs ist",2],["Person, die komplett in einer Farbe gekleidet ist (außer Schwarz)",2],["Person, die uns in einer anderen Sprache anspricht",2],
+["Jemand trägt Pantoffeln oder Badeschlappen draußen",1],["Ein Fahrrad ist an einem Baum oder Schild festgesperrt",1],["Jemand fotografiert sein Essen",1]
 ];
 
+var SEASON=[
+["Jemand trägt eine Mütze mit Bommel","12-01","02-29"],["Jemand wärmt sich die Hände an einem heißen Becher","12-01","02-29"],
+["Ein Schneemann oder eine Schneefigur","12-01","02-29"],["Jemand kratzt oder schiebt Schnee oder Eis weg","12-01","02-29"],
+["Jemand trägt einen Weihnachtsbaum","12-01","12-24"],["Jemand trägt Weihnachtsmütze oder Rentiergeweih","12-01","12-26"],
+["Eine lange Schlange vor einem Punsch- oder Maronistand","11-15","12-23"],["Jemand hat Wunderkerzen oder Feuerwerk","12-28","01-02"],
+["Die ersten Menschen im T-Shirt","03-01","05-31"],["Ein blühender Baum, unter dem jemand ein Foto macht","03-15","05-15"],
+["Jemand sitzt zum ersten Mal im Jahr draußen im Café","03-01","04-30"],
+["Jemand kühlt Füße oder Gesicht an einem Brunnen","06-01","08-31"],["Jemand sucht Schatten und sitzt auf dem Boden","06-01","08-31"],
+["Eine Gruppe liegt auf einer Wiese oder am Ufer","06-01","08-31"],
+["Jemand läuft absichtlich durch Laub","09-15","11-30"],["Jemand trägt einen Kürbis","10-01","10-31"],
+["Jemand sammelt Kastanien oder Eicheln","09-01","10-31"],["Jemand ist verkleidet","10-25","11-02"]
+];
+function md(d){var m=d.getMonth()+1,x=d.getDate();return(m<10?"0":"")+m+"-"+(x<10?"0":"")+x}
+function inSeason(a){var n=md(new Date()),f=a[1],g=a[2];return f<=g?(n>=f&&n<=g):(n>=f||n<=g)}
+function dstr(d){return d.getFullYear()+"-"+md(d)}
 var KEY="streetwork-bingo-solo-v1",MAXSKIP=3;
 var LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 var me=null,sel=-1;
 var $=function(id){return document.getElementById(id)};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var bTimer=null;
+function bingo(a,b){var e=$("bingo");e.innerHTML="<span>"+esc(a)+"</span><small>"+esc(b)+"</small>";e.classList.add("show");try{if(navigator.vibrate)navigator.vibrate(150)}catch(x){}clearTimeout(bTimer);bTimer=setTimeout(function(){e.classList.remove("show")},2000)}
 function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show")},2200)}
 function load(){try{var r=localStorage.getItem(KEY);return r?JSON.parse(r):null}catch(e){return null}}
 var warned=false;
@@ -159,12 +197,18 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(me))}catch(e){if(!wa
 function rnd(n){return Math.floor(Math.random()*n)}
 function T(k){
 if(k.charAt(0)==="b"){var t=TASKS[+k.slice(1)];return t?{t:t[0],p:1}:null}
+if(k.charAt(0)==="s"){var a=SEASON[+k.slice(1)];return a&&inSeason(a)?{t:a[0],p:1}:null}
 var c=me.custom[k];return c?{t:c.t,p:1}:null}
-function allKeys(){var r=[];for(var i=0;i<TASKS.length;i++)if(TASKS[i])r.push("b"+i);for(var k in me.custom)r.push(k);return r}
+function allKeys(){var r=[];for(var i=0;i<TASKS.length;i++)if(TASKS[i])r.push("b"+i);for(var j=0;j<SEASON.length;j++)if(inSeason(SEASON[j]))r.push("s"+j);for(var k in me.custom)r.push(k);return r}
 function newBoard(){
 var avail=allKeys().filter(function(k){return me.found.indexOf(k)<0});
 if(avail.length<9){me.found=[];avail=allKeys()}
-var b=[];while(b.length<9&&avail.length)b.push({k:avail.splice(rnd(avail.length),1)[0],s:0});
+var b=[],sea=avail.filter(function(k){return k.charAt(0)==="s"});
+avail=avail.filter(function(k){return k.charAt(0)!=="s"});
+for(var n=0;n<2&&sea.length;n++)b.push({k:sea.splice(rnd(sea.length),1)[0],s:0});
+avail=avail.concat(sea);
+while(b.length<9&&avail.length)b.push({k:avail.splice(rnd(avail.length),1)[0],s:0});
+for(var i=b.length-1;i>0;i--){var j=rnd(i+1),x=b[i];b[i]=b[j];b[j]=x}
 me.board=b}
 function swapKey(){
 var on=me.board.map(function(c){return c.k});
@@ -176,7 +220,8 @@ function boardPts(){var s=0;me.board.forEach(function(c){if(c.s)s+=c.p||0});s+=n
 function total(){return me.banked+boardPts()}
 function dayKey(){return new Date().toDateString()}
 function refreshSkips(){var d=dayKey();if(me.skipDay!==d){me.skipDay=d;me.skips=MAXSKIP;return true}return false}
-function fresh(name){me={name:name,score:0,banked:0,found:[],skipDay:dayKey(),skips:MAXSKIP,recent:[],round:1,log:[],board:[],custom:{}};newBoard()}
+function fresh(name){me={name:name,score:0,banked:0,found:[],skipDay:dayKey(),skips:MAXSKIP,recent:[],round:1,log:[],board:[],custom:{},days:{},counts:{},best:0};newBoard()}
+function streak(){var d=new Date(),n=0;if(!me.days[dstr(d)])d.setDate(d.getDate()-1);while(me.days[dstr(d)]){n++;d.setDate(d.getDate()-1)}return n}
 function dayStart(){var d=new Date();d.setHours(0,0,0,0);return d.getTime()}
 function weekStart(){var d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getTime()}
 function sum(a,b){var s=0;me.log.forEach(function(e){if(e[0]>=a&&e[0]<b)s+=e[1]});return s}
@@ -200,24 +245,31 @@ $("meName").textContent="Runde "+me.round;
 $("meScore").textContent=me.score;
 $("meInfo").textContent=me.board.filter(function(x){return x.s}).length+"/9 auf der Karte · "+nLines()+" Reihen · "+me.skips+" Tausche heute übrig";
 var st=stats();$("sDay").textContent=st.day;$("sWeek").textContent=st.week;$("sLast").textContent=st.last;
-$("txt").value="Streetwork Bingo\nHeute: "+st.day+" Punkte\nDiese Woche: "+st.week+" Punkte\nLetzte Woche: "+st.last+" Punkte";
+var sk=streak(),keys=Object.keys(me.counts),tot=0;keys.forEach(function(k){tot+=me.counts[k]});
+$("sStreak").textContent=sk;$("sBest").textContent=Math.max(me.best,sk);$("sTotal").textContent=tot;
+keys.sort(function(a,b){return me.counts[b]-me.counts[a]||(a<b?-1:1)});
+$("top").innerHTML=keys.length?keys.slice(0,3).map(function(k){return '<li><span>'+esc(k)+'</span><strong>'+me.counts[k]+'×</strong></li>'}).join(""):'<li><span>Noch nichts gesehen.</span></li>';
+$("txt").value="Streetwork Bingo\nHeute: "+st.day+" Punkte\nDiese Woche: "+st.week+" Punkte\nLetzte Woche: "+st.last+" Punkte\nSerie: "+sk+(sk===1?" Tag":" Tage")+" in Folge";
 var mine=Object.keys(me.custom);
 $("mine").innerHTML=mine.map(function(k){return '<li><span>'+esc(me.custom[k].t)+' ('+me.custom[k].p+')</span><button data-del="'+esc(k)+'">Löschen</button></li>'}).join("");
 }
 
 function mark(i){
 var c=me.board[i],t=T(c.k);if(c.s||!t)return;
-var before=total();
+var before=total(),lb=nLines();
 c.s=1;c.t=t.t;c.p=t.p;me.found.push(c.k);me.recent.unshift(t.t);me.recent=me.recent.slice(0,3);
-var after=total(),d=after-before;logDelta(d);
-if(me.board.every(function(x){return x.s})){me.banked=after;newBoard();sel=-1;toast("Karte voll! +"+d+" Punkte, neue Karte")}
-else toast("+"+d+(d>t.p?" Punkte (Bonus!)":" Punkte"));
+var after=total(),d=after-before,la=nLines();logDelta(d);
+me.days[dstr(new Date())]=1;me.counts[t.t]=(me.counts[t.t]||0)+1;
+var sk=streak();if(sk>me.best)me.best=sk;
+if(me.board.every(function(x){return x.s})){me.banked=after;newBoard();sel=-1;toast("Karte voll! +"+d+" Punkte, neue Karte");bingo("Karte voll!","+"+d+" Punkte, neue Karte")}
+else{toast("+"+d+(d>t.p?" Punkte (Bonus!)":" Punkte"));if(la>lb)bingo("Bingo!","Reihe voll: +"+(la-lb)*2+" Bonus")}
 me.score=total();render();save()}
 function unmark(i){
 var c=me.board[i];if(!c.s)return;
 var before=total();
 c.s=0;me.found=me.found.filter(function(k){return k!==c.k});
 var j=me.recent.indexOf(c.t);if(j>=0)me.recent.splice(j,1);
+if(me.counts[c.t]){me.counts[c.t]--;if(me.counts[c.t]<1)delete me.counts[c.t]}
 var d=total()-before;logDelta(d);me.score=total();render();save();toast(d+" Punkte")}
 function swap(i){
 refreshSkips();var c=me.board[i];if(c.s||me.skips<1)return;
@@ -256,10 +308,11 @@ function start(){$("join").hidden=true;$("game").hidden=false;render()}
 
 me=load();
 if(me&&Array.isArray(me.board)&&me.board.length===9){
-me.custom=me.custom||{};me.log=me.log||[];me.found=me.found||[];me.recent=me.recent||[];
+me.custom=me.custom||{};me.days=me.days||{};me.counts=me.counts||{};me.best=me.best||0;me.log=me.log||[];me.found=me.found||[];me.recent=me.recent||[];
 refreshSkips();me.board.forEach(function(c){if(!c.s&&!T(c.k)){var nk=swapKey();if(nk)c.k=nk}});
 me.score=total();start();save()}
 else{fresh("");start();save()}
+try{if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){})}catch(e){}
 })();
 </script>
 </body>
