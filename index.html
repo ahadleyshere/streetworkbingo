@@ -62,7 +62,7 @@ input{width:100%;min-height:46px;padding:8px 12px;border:1px solid var(--line);b
 details.add{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:22px}
 details.add summary{font-weight:700;cursor:pointer;min-height:32px}
 details.add summary:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
-.addrow{display:grid;grid-template-columns:1fr 92px;gap:10px;margin:10px 0}
+.addrow{display:grid;grid-template-columns:1fr;gap:10px;margin:10px 0}
 select{width:100%;min-height:46px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit}
 .mine{list-style:none;margin:10px 0 0;padding:0}
 .mine li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
@@ -95,7 +95,7 @@ textarea{width:100%;min-height:90px;padding:10px;border:1px solid var(--line);bo
 <h2>Deine Bingo-Karte</h2>
 <div class="board" id="board"></div>
 <div class="act" id="act"></div>
-<p class="note">Reihe, Spalte oder Diagonale voll: +5 Bonus. Ganze Karte voll: +15 Bonus und eine neue Karte.</p>
+<p class="note">Reihe, Spalte oder Diagonale voll: +2 Bonus. Ganze Karte voll: +5 Bonus und eine neue Karte.</p>
 
 <h2>Dein Stand</h2>
 <div class="stats">
@@ -108,7 +108,7 @@ textarea{width:100%;min-height:90px;padding:10px;border:1px solid var(--line);bo
 <textarea id="txt" readonly hidden aria-label="Stand als Text"></textarea>
 
 <details class="add"><summary>Eigene Aufgabe hinzufügen</summary>
-<div class="addrow"><input id="newT" maxlength="80" placeholder="Was kann man in der Stadt sehen?" aria-label="Neue Aufgabe"><select id="newP" aria-label="Punkte"><option value="1">1 Pkt</option><option value="2" selected>2 Pkt</option><option value="3">3 Pkt</option></select></div>
+<div class="addrow"><input id="newT" maxlength="80" placeholder="Was kann man in der Stadt sehen?" aria-label="Neue Aufgabe"></div>
 <button class="primary" id="addT">Aufgabe hinzufügen</button>
 <p class="note">Eigene Aufgaben gelten nur auf diesem Gerät.</p>
 <ul class="mine" id="mine"></ul></details>
@@ -123,24 +123,28 @@ textarea{width:100%;min-height:90px;padding:10px;border:1px solid var(--line);bo
 <script>
 (function(){
 var TASKS=[
-["Eine Person sammelt Pfandflaschen",3],["Jemand hört Musik laut über Handylautsprecher",2],["Ein Hund trägt Mantel oder Pullover",2],
-["Eine Person fährt Tandem oder Lastenrad",3],["Jemand telefoniert und läuft dabei im Kreis",1],["Eine Taube sitzt auf einem Fahrrad oder Müllkübel",2],
+["Eine Person sammelt Pfand",1],["Jemand hört ohne Kopfhörer Musik oder schaut YouTube",1],["Ein Hund trägt Mantel oder Pullover",2],
+["Eine Person fährt Tandem oder Lastenrad",3],null,["Eine Taube sitzt auf einem Fahrrad oder Müllkübel",2],
 ["Jemand trägt etwas Sperriges allein durch die Stadt",2],["Eine Person liest ein gedrucktes Buch im Stehen",3],["Zwei Menschen mit dem gleichen Outfit",3],
 ["Jemand isst Eis, obwohl es kalt ist",2],["Straßenmusik, egal welches Instrument",1],["Eine Person mit Regenschirm bei Sonne",2],
 ["Jemand schläft auf einer Bank",2],["Eine Person lacht laut allein",2],["Ein Fahrrad mit ungewöhnlicher Ladung",2],
 ["Jemand trägt Hut und Krawatte",2],["Ein Tisch oder Sofa steht am Gehsteig zum Mitnehmen",3],["Jemand spielt Schach oder Karten draußen",3],
-["Ein E-Scooter liegt an einem unmöglichen Ort",2],["Ein Mensch tanzt mitten auf dem Gehsteig",3],["Eine Person trägt Sonnenbrille bei Regen",2],
-["Eine Gruppe macht ein Selfie",1],["Ein Kind auf dem Roller, dahinter die Eltern auf Rädern",2],["Jemand trägt zwei verschiedene Schuhe",3],
+null,["Ein Mensch tanzt mitten auf dem Gehsteig",3],["Eine Person trägt Sonnenbrille bei Regen",2],
+["Eine Gruppe macht ein Selfie",1],null,["Jemand trägt zwei verschiedene Schuhe",3],
 ["Ein riesiger Hund mit winzigem Besitzer",3],["Eine Person mit Blumenstrauß",1],["Eine Person schiebt ein Fahrrad mit plattem Reifen",2],
-["Jemand zählt Münzen im Stehen",3],["Ein Regenbogen oder ein Doppelregenbogen",3],["Jemand telefoniert mit Kopfhörern und gestikuliert wild",1],
-["Jemand verkauft oder liest eine Straßenzeitung",2],["Eine Person hilft einer anderen mit der Tasche oder der Tür",1],
-["Jemand teilt Essen oder Getränke mit einer anderen Person",2],["Ein Mensch mit Schlafsack oder Decke auf einer Bank",2],
-["Eine Person mit vollbepacktem Einkaufswagen",2],["Ein Hund liegt entspannt auf einer Decke vor einem Geschäft",2],
-["Jemand füllt eine Flasche an einem Trinkbrunnen",2],["Eine Person durchsucht einen Mülleimer nach Pfand",3],
-["Zwei Menschen unterhalten sich lange und herzlich auf der Straße",1],["Jemand wartet vor einem Geschäft, das noch geschlossen ist",1],
-["Ein Mensch trägt im Sommer Winterjacke",2],["Jemand füttert Tauben, obwohl es verboten ist",2],["Eine Person fährt mit dem Rad ohne Licht in der Dämmerung",1],
+null,["Ein Regenbogen",1],["Jemand telefoniert mit Kopfhörern und gestikuliert wild",1],
+["Jemand verkauft oder liest eine Straßenzeitung",2],null,
+null,["Ein Mensch mit Schlafsack oder Decke auf einer Bank",2],
+["Eine Person mit vollbepacktem Einkaufswagen",2],["Ein Hund wartet vor einem Geschäft",1],
+["Jemand füllt eine Flasche an einem Trinkbrunnen",2],null,
+null,["Jemand wartet vor einem Geschäft, das noch geschlossen ist",1],
+null,["Jemand füttert Tauben, obwohl es verboten ist",2],["Eine Person fährt mit dem Rad ohne Licht in der Dämmerung",1],
 ["Ein Auto mit Kennzeichen aus einem anderen Bundesland",1],["Jemand sitzt auf dem Boden und liest oder schreibt",2],["Eine Person macht Yoga oder Dehnübungen im Park",3],
-["Jemand fährt einen Rollstuhl mit Musik oder Wimpel",3],["Ein Mensch jongliert oder macht Straßenzauber",3]
+["Jemand fährt einen Rollstuhl mit Musik oder Wimpel",3],["Ein Mensch jongliert oder macht Straßenzauber",3],
+["Person mit einer kurzen karierten Hose",2],["Person mit Fahrradhelm ohne Fahrrad",2],["Tinder-Date",3],["Ratten",3],
+["Menschen, die mit Katzen spazieren gehen",3],["Person mit Kleidung, die nicht wetteradäquat ist",1],["Person, die Zigarettenstummel sammelt und raucht",3],
+null,["Personen, die mehr als 3 Vogelfedern mitführen",3],["Personen, die ohne Auto übersiedeln",3],
+["Person, die mit mehr als 5 Sackerln unterwegs ist",2],["Person, die komplett in einer Farbe gekleidet ist (außer Schwarz)",2],["Person, die uns in einer anderen Sprache anspricht",2]
 ];
 
 var KEY="streetwork-bingo-solo-v1",MAXSKIP=3;
@@ -154,9 +158,9 @@ var warned=false;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(me))}catch(e){if(!warned){warned=true;toast("Speichern im Browser nicht möglich")}}}
 function rnd(n){return Math.floor(Math.random()*n)}
 function T(k){
-if(k.charAt(0)==="b"){var t=TASKS[+k.slice(1)];return t?{t:t[0],p:t[1]}:null}
-var c=me.custom[k];return c?{t:c.t,p:c.p}:null}
-function allKeys(){var r=[];for(var i=0;i<TASKS.length;i++)r.push("b"+i);for(var k in me.custom)r.push(k);return r}
+if(k.charAt(0)==="b"){var t=TASKS[+k.slice(1)];return t?{t:t[0],p:1}:null}
+var c=me.custom[k];return c?{t:c.t,p:1}:null}
+function allKeys(){var r=[];for(var i=0;i<TASKS.length;i++)if(TASKS[i])r.push("b"+i);for(var k in me.custom)r.push(k);return r}
 function newBoard(){
 var avail=allKeys().filter(function(k){return me.found.indexOf(k)<0});
 if(avail.length<9){me.found=[];avail=allKeys()}
@@ -168,7 +172,7 @@ var a=allKeys().filter(function(k){return on.indexOf(k)<0&&me.found.indexOf(k)<0
 if(!a.length)a=allKeys().filter(function(k){return on.indexOf(k)<0});
 return a.length?a[rnd(a.length)]:null}
 function nLines(){return LINES.filter(function(l){return l.every(function(i){return me.board[i].s})}).length}
-function boardPts(){var s=0;me.board.forEach(function(c){if(c.s)s+=c.p||0});s+=nLines()*5;if(me.board.every(function(c){return c.s}))s+=15;return s}
+function boardPts(){var s=0;me.board.forEach(function(c){if(c.s)s+=c.p||0});s+=nLines()*2;if(me.board.every(function(c){return c.s}))s+=5;return s}
 function total(){return me.banked+boardPts()}
 function dayKey(){return new Date().toDateString()}
 function refreshSkips(){var d=dayKey();if(me.skipDay!==d){me.skipDay=d;me.skips=MAXSKIP;return true}return false}
@@ -232,7 +236,7 @@ if(!confirm("Neue Runde starten? Runden-Punkte werden zurückgesetzt, die heutig
 me.round++;me.score=0;me.banked=0;me.found=[];me.recent=[];sel=-1;newBoard();render();save();toast("Runde "+me.round+" läuft")};
 $("addT").onclick=function(){
 var t=$("newT").value.trim();if(t.length<5){toast("Bitte kurz beschreiben, was man sieht");return}
-me.custom["c_"+Date.now().toString(36)+rnd(999)]={t:t,p:+$("newP").value};
+me.custom["c_"+Date.now().toString(36)+rnd(999)]={t:t,p:1};
 $("newT").value="";render();save();toast("Aufgabe hinzugefügt")};
 $("mine").addEventListener("click",function(e){
 var k=e.target.getAttribute("data-del");if(!k)return;
